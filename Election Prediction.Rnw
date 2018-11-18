@@ -1,0 +1,24 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+summary(S_data)
+date<-Sienema_data$DateTaken
+dates <- as.Date(S_data$Date, format = "%m/%d")
+
+dat<-data.frame(S_data[-7,-c(1,3)])
+mod <- lm(Dem ~. , data = dat)
+summary(mod)
+
+newObs<-data.frame(S_data[7,-c(1,2,3)])
+predict(mod,newObs)
+@
+<<time_plot, echo = FALSE>>=
+plot
+plot(dates, S_data$McSally, type='p', col="red")
+points(dates, S_data$Sienema, type='p', col="blue")
+@
+
+\end{document}

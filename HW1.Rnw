@@ -1,0 +1,483 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                     %If you find yourself trying to replicate
+                     %something you found online, ensure you're
+                     %loading the necessary packages!
+\usepackage{amsfonts}%Math font
+\usepackage{graphicx}%For including graphics
+\usepackage{hyperref}%For Hyperlinks
+\usepackage{natbib}        %For the bibliography
+\bibliographystyle{apalike}%For the bibliography
+\usepackage[margin=1.0in]{geometry}
+\usepackage{float}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\SweaveOpts{width=8,height=5}%set the size of the graphs to fit nicely on a 8.5x11 sheet
+\noindent \textbf{MA 354: Data Analysis I -- Fall 2018}\\%\\ gives you a new line
+\noindent \textbf{Homework 1:}\vspace{1em}\\
+\emph{Complete the following opportunities to use what we've talked about in class. 
+These questions will be graded for correctness, communication and succinctness. Ensure
+you show your work and explain your logic in a legible and refined submission.}\\
+%Comments -- anything after % is not put into the PDF
+\begin{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item[0.] \textbf{Complete weekly diagnostics.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{(Data Summary)} Below you will load and summarize a dataset 
+  containing 575 observations of drug treatments. The data includes the following
+  \begin{itemize}
+    \item ID --	Identification Code	(1 - 575)
+    \item AGE	-- Age at Enrollment	(Years)
+    \item BECK -- Beck Depression Score	(0.000 - 54.000)
+    \item HC --	Heroin/Cocaine Use During	3 Months Prior to Admission (1 = Heroin
+    \& Cocaine; 2 = Heroin Only, 3 = Cocaine Only; 4 = Neither Heroin nor Cocaine)
+    \item IV -- History of IV Drug Use	(1 = Never; 2 = Previous; 3 = Recent)
+    \item IV3	-- Recent IV use	(1 = Yes; 0 = No)
+    \item NDT -- Number of Prior Drug Treatments (0 - 40)
+    \item RACE -- Subject's Race	(0 = White; 1 = Non-White)
+    \item TREAT -- Treatment Randomization (0 = Short Assignment;	1 = Long Assignment)
+    \item SITE -- Treatment Site (0 = A; 1 = B)
+    \item LEN.T	-- Length of Stay in Treatment (Days Admission Date to Exit Date)	
+    \item TIME -- Time to Drug Relapse (Days Measured from Admission Date)
+    \item CENSOR -- Event for Treating Lost to Follow-Up as Returned to Drugs 
+    (1 = Returned to Drugs or Lost to Follow-Up; 0 = Otherwise)
+    \item etc.
+  \end{itemize}
+  \begin{enumerate} %this begins a lettered enumerate so I can ask more 
+                    %than one question in a question.
+    \item Load data
+<<eval=FALSE>>=
+install.packages("quantreg",repos = "http://cloud.r-project.org/")
+library("quantreg")
+data("uis")
+@
+    \item Add the citation for quantreg to the .bib file and this .pdf. You can get
+    the BibText for this citation in \texttt{R} by executing \texttt{citation("quantreg")}.
+    Ensure to add the citation to the .bib file and replace ``THIS" with the citation.\\
+    
+    THIS provides a dataset containing 575 observations of drug treatments.\\
+
+    \item Numerically summarize the Beck Depression Score of the observed drug 
+    treatment patients. Note the following designations of the test when interpreting
+    your results.
+    \begin{itemize}
+      \item 0-13: minimal depression
+      \item 14-19: mild depression
+      \item 20-28: moderate depression
+      \item 29-63: severe depression.
+    \end{itemize}
+    \item Graphically summarize the Beck Depression Score of the
+    observed drug treatment patients. Interpret the results through 
+    the lens of the scale above.
+    \item List three questions about drug use that we might be able to answer based on the 
+    data we have.
+  \end{enumerate}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Chapter 2, Question 3.} \textbf{Hint:} You can generate random twenty observations 
+  drawn from the Uniform(0,1) distribution in R via the following code.
+<< >>=
+x<-runif(n=20,min=0,max=1)
+sum(x)
+@
+\textbf{A guide to solving this question.}
+  \begin{enumerate}
+    \item Choose what type of loop is necessary for this problem. Consider whether the
+    end of iteration is based on a number or a condition. Explain your choice.
+    \item The central limit theorem states that as $n$ increases
+    \[\sum_{i=1}^n {X} \sim N(\mu = nE(X), \sigma = \sqrt{n}sd(X)).\]
+    Write out this statement for the sample of twenty observations drawn
+    from the Uniform(0,1) distribution. Hint, this will be the mean and standard
+    deviation of the normal curve you will overlay on the histogram.
+    \item Code a loop that generates twenty observations drawn from the Uniform(0,1) 
+    distribution, calculates the sum of those twenty observations and stores it as 
+    many times as necessary. Finally, plot a histogram of the saved sums with an
+    overlay of the normal curve from (b).
+    \item Repeat (b) and (c) for the exponential($\beta$=5) distribution and the normal(0,1)
+    distribution. Note the differences.
+<<eval=FALSE>>=
+rexp(n=20,rate = 1/5)
+rnorm(n=20,mean=0,sd=1)
+@
+    \item Create histograms for the sum of $n$ observations drawn from these 
+    three distributions for samples of size $n=3,5,10,20,50,100$ and record 
+    theie shape. Ensure to make remarks about the results.
+  \begin{table}[H]
+	  \begin{center}
+		  \begin{tabular} {|l|c|c|c|} \hline
+			    n & Exponential & Uniform    & Normal\\\hline\hline
+			    1 &&&\\
+			    3 &&&\\
+			    10&&&\\
+			    20&&&\\
+			    50&&&\\
+			    100&&&\\\hline
+		  \end{tabular}
+		  \caption{Shape of the distribution of sums for the 
+		  Exponential($\beta$=5), Uniform(0,1) and Normal(0,1) distributions
+		  across $n$.}\label{psim}
+	  \end{center}
+  \end{table}
+  \end{enumerate}
+  \newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{(Confidence Intervals)} \cite{Agresti98} wrote 
+  \href{https://www.jstor.org/stable/2685469?seq=1}{a paper}
+  about how the confidence intervals that approximate the binomial are better than the 
+  exact Pearson Clopper interval. Below, I delinate the steps for recreating their 
+  simulation study. First we need some terminology.\\
+  
+	The \textbf{coverage probability} of a confidence interval approach is the probability 
+	that the approach leads to a confidence interval that contains the true population 
+	value, e.g., the probability the Wald interval contains the true population 
+	proportion.\\	
+	\textbf{Note:} We expect the coverage to be at least the confidence level;
+	for example \textbf{at least} 95\% coverage for a 95\% confidence interval.
+
+  We can simulate 10000 binomial experiments with 100 trials with success probability
+  of 0.50 using to the following code. Each cell of \texttt{dat} representts one of 
+  the 1000 simulated experiments.
+<< >>=
+sims<-10000
+numTrials<-100
+trueP<-runif(n=sims,min=0,max=1) #randomly generated success probabilities
+dat<-rbinom(n=sims,size=numTrials,p=trueP) #generate random experiments
+head(dat) #view the first few simulated experiments
+@
+  We can then calculate a Wald confidence interval for each simulated experiment. 
+<< >>=
+install.packages("binom",repos = "http://cloud.r-project.org/")
+library("binom")
+wald<-binom.confint(x = dat,n = numTrials,conf.level = 0.95,methods = "asymptotic")
+head(wald) #view the first few confidence intervals
+@
+
+  Finally, we can see if the true success probability is contained within the
+  calculated Wald intervals. 
+
+<< >>=
+#is the success probability on the interval?
+captured_wald<- wald$lower<=trueP &  wald$upper>=trueP 
+#view whether or not the first few intervals contain trueP
+head(captured_wald) 
+#(number of intervals containing trueP)/sims
+coverage_wald<- sum(captured_wald)/sims  
+#the empirical coverage probability (changes every time we run (it's random))
+coverage_wald 
+@
+  Complete this analysis for the Wald (wald), Agresti-Coull (ac), Wilson (wilson)
+  and Pearson Clopper (exact) intervals to fill in the following table. Ensure to bold
+  the ``best" result according to the caption. Record some observations about the 
+  results, including a rule-of-thumb about which approach to use when.
+  \begin{table}[H]
+	  \begin{center}
+		  \begin{tabular} {|l|c|c|c|c|} \hline
+			  n    & Wald & Wilson & Agresti & Clopper\\\hline\hline
+			  5    &&&&\\
+			  15   &&&&\\
+			  30   &&&&\\
+			  50   &&&&\\
+			  100  &&&&\\
+			  1000 &&&&\\
+			  10000&&&&\\\hline
+		  \end{tabular}
+		  \caption{Empirical coverage probabilities of 95\% confidence intervals for 
+		  a population proportions. Sampling of $p$ is done from a Uniform(0,1) distribution.
+		  The closest to at least 95\% coverage for each sample size is in bold.}\label{psim}
+	  \end{center}
+  \end{table}
+  \newpage
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%  Question 4
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \item \textbf{(Data Summary \& Inference)} Hepatitis C is a disease 
+    that affects the liver. The virus that causes hepatitis C 
+    is spread through blood or bodily fluids of an infected person. 
+    The virus is often difficult to diagnose because there are few unique 
+    symptoms. Those infected, however, sometimes experience jaundice -- a 
+    condition that causes yellowing of the skin or eyes, as the liver 
+    is infected.
+
+    \cite{Bracht16} consider the human microfibrillar-associated protein 4,
+    or MFAP4, and its role in disease-related tissue. Stage 0--no fibrosis; 
+    Stage 1--enlarged, fibrotic portal tracts; Stage 2--periportal fibrosis 
+    or portal-portal septa, but intact architecture; Stage 3--fibrosis with
+    architectural distortion, but no obvious cirrhosis; and Stage 4--probable
+    or definite cirrhosis.
+
+    Previously, it has been shown that MFAP4 is a biomarker candidate for hepatic
+    fibrosis and cirrhosis in hepatitis C patients. The analysis of \cite{Bracht16}
+    aimed to consider the ability of MFAP4 to differentiate between stages of the 
+    disease -- fibrosis stages (0-2) and cirrhosis (3-4) based on the Scheuer 
+    scoring system.
+
+  \begin{enumerate}
+  \item Summarize the data from \cite{Bracht16} by asking \texttt{R} for
+  the summaries necessary to fill in the table below.
+<<eval=FALSE>>=
+###Download data
+dat<-read.table("http://cipolli.com/Students/105/CodeandData/biomarkerData.txt",
+  header=T,sep=",")
+head(dat)
+###Grab data with stage zero fibrosis
+dat0<-dat[which(dat$Fibrosis.Stage==0),]
+@
+    \begin{table}[H]\centering
+    	\begin{tabular}{l|lllll}\hline
+    		Fibrosis Stage & 0 & 1 & 2 & 3 & 4\\\hline\hline
+    		Median MFAP4&&&&&\\
+    		Mean MFAP4 &&&&&\\
+    		St. Dev MFAP4&&&&&\\\hline\hline
+    		Mean age   &&&&&\\
+    		\# Women   &&&&&\\
+    		\# Men     &&&&&\\\hline
+    		\# Patients&&&&&\\\hline\hline
+    	\end{tabular}
+    \end{table}
+    \item Create a function that completes the percentile bootstrap confidence interval 
+    for the population median of a given data vector $x$. You will find the quantile function
+    below helpful.
+<<eval=FALSE>>=    
+x<-rnorm(100,0,1)
+quantile(x, probs = c(0.025, 0.975)) 
+@
+    \item Use your function from part (b) to calculate a 95\% confidence interval for the
+    populaiton median for participants in each Fibrosis Stage.\\
+    \item Interpret these confidence intervals in the context of the problem.\\
+    \item Calculate the $t$ interval for each Fibrosis Stage. Are these intervals wider,
+    narrower, or of similar length? Be sure to explain why this might be the case.\\
+  \end{enumerate}
+\newpage
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%  Question 5
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{(Inference)} On November 9$^{\textrm{th}}$, the 22$^{\textrm{nd}}$ 
+  congressional district of New York will hold an election for their congress person.
+  The most recent poll shows the incumbent, Claudia Tenney, slightly behind Democrat 
+  Anthony Brindisi.
+  
+  \cite{Siena} released 
+  \href{http://files.constantcontact.com/9c83fb30501/8cdd5285-3e4e-46cb-bf8a-8fe9ecad953e.pdf}{a poll} 
+  on August 29, 2018. The survey was conducted August 20-26, 2018 by telephone 
+  calls in English to 499 likely 22nd congressional district voters via both land 
+  and cell phones. Of those surveyed, approximately 220 said they would vote for
+  Tenney and 230 for Brindisi. 
+  
+  If you're a US Citizen:\\
+    \textbf{Register to Vote:} \href{https://www.vote.org/}{https://www.vote.org/}\\
+    \textbf{Get your absentee ballot:} \href{https://www.vote.org/absentee-ballot/}{https://www.vote.org/absentee-ballot/}
+  
+  \begin{enumerate}
+    \item Is this race still ``too close to call?" Use a technique for statistical
+    inference to answer the question of whether or not we have enough evidence
+    to call the race for either of the candidates.\\
+    \item Compare the 
+    \href{https://scri.siena.edu/wp-content/uploads/2018/08/CD220818-Crosstabs.pdf}
+    {sample demographics of the survey} to the 
+    \href{https://censusreporter.org/profiles/50000US3622-new-york-congressional-district-22/}
+    {population demographics as estimated by the census.} Consider 
+    the differences of these groups and discuss their potential 
+    harm or benefit to the study.
+  \end{enumerate}
+  \newpage
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%  Question 6
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{(Data Summary \& Inference)} On our first day of class, I walked you 
+  by the water fountain on the first floor of McGregory Hall. I posed the question 
+  of whether water drawn from the unfiltered portion was better or worse than the 
+  filtered version, noting that the filter is showing the red `replace' status 
+  (which it has been for months). Finally, someone changed it -- which I've concluded
+  is not independent of our loud conversation in the hall.
+  \begin{enumerate}
+    \item The first part of this inquiry is collecting the data. I will task all 
+    of you with collecting samples of water from a filtered and unfiltered
+    source and recording the pH and total disolved solids (TDS) measurements.
+    Friday September 7th I will have the tools set up in my office and we will 
+    run the study.\\
+    
+    Items to record:
+    \begin{itemize}
+      \item Source (filtered (water fountain), unfiltered (bathroom sink))
+      \item Time
+      \item Day of the week
+      \item pH level
+      \item TDS
+    \end{itemize}
+    \item Once data is collected, I will make the data available to you. Please
+    answer my question -- ``Compared to tap water, how much better is filtered water?"
+    \item What, if anything, could we have done to improve our study? 
+  \end{enumerate}
+  \newpage
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%  Question 7
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \item \textbf{(Generalizable Skill)} Pick a graphical display from this homework
+    and recreate it using the ``ggplot2" package in \texttt{R}. You can load this
+    package as follows. Note that I've also posted a ggplot2 cheatsheet on Moodle.
+<<eval=FALSE>>=
+install.packages("ggplot2",repos = "http://cloud.r-project.org/")
+library("ggplot2")
+@
+    \newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Optional Question
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Optional Challenge Problem:} First we need some terminology.\\
+  
+	The \textbf{significance level} for a hypothesis test, $\alpha$, specifies 
+	how unusual an observation is required to be for consideration as evidence 
+	against the null hypothesis. Thus, if the probability value is less than or 
+	equal to $\alpha$, \textbf{we reject} $H_0$; e.g., the observed data is
+	unusual enough under the null hypothesis that it provides evidence against 
+	it. If the probability value is greater than $\alpha$, 
+	\textbf{we fail to reject} $H_0$\\
+	\textbf{Note:} We expect the significance level to be at most $\alpha$;
+	for example at most 0.05 significance for a 95\% confidence level.
+
+  We can simulate 10000 binomial experiments with 100 trials with success probability
+  of 0.15 using to the following code. Each cell of \texttt{dat} representts one of 
+  the 10000 simulated experiments.
+<<eval=FALSE>>=
+  ####Significance
+  sims<-10000
+  numTrials<-100
+  p0<-0.15 #null hypothesis
+  dat<-rbinom(n=sims,size=numTrials,p=p0)#generate data
+@
+  We can calculate the p-values for the Exact, Score, and Wald tests as well
+  as the 95\% Wilson confidence interval for all 10000 simulations by calculating 
+  the following in a loop. For example, these can be calculated for first 
+  simulated experiment in \texttt{R}.
+  
+<<eval=FALSE>>=
+#Exact Hypothesis Test
+pval_exact=binom.test(x=dat[1],n=numTrials,p=p0,alternative="two.sided")$p.value
+#Score Hypothesis Test
+pval_score=prop.test(x=dat[1],n=numTrials,p=p0,alternative="two.sided")$p.value
+#Wald Hypothesis Test
+p_hat<-dat[1]/numTrials
+pval_wald<-2*pnorm(-abs((p_hat-p0)/sqrt(p_hat*(1-p_hat)/numTrials)),0,1)
+#Wilson Confidence Interval
+wilsonCI<-binom.confint(x = dat[1],n = numTrials,conf.level = CI_conf,methods = "wilson")
+@
+
+Finally, we can see if the we reject each test by checking if the p-values above are less
+than 0.05 (denoting 95\% confidence). By saving this, we can calculate the significance
+of this test. For example, we can check and save exact as 1 if we reject the exact test.
+
+<<eval=FALSE>>=
+exact<-0
+if(pval_exact<0.05){
+  exact<-1
+}
+@
+  
+I often tell students that, for a two sided hypothesis, they can consider whether or not
+a Wilson 95\% confidence interval contains the value of interest, $p0$. We can check if
+the confidence interval contains this value as follows.
+
+<<eval=FALSE>>=
+if(p0<wilsonCI$lower || p0>wilsonCI$upper){
+  wilson<-1
+}
+@
+  Create a loop that completes this analysis, saving the rejections, for the simulated
+  binomial experiments. In this setting, the number of rejections divided by the number
+  of simulations equals the significance. Does the significance based on the hypothesis
+  test match that of the test based on the confidence interval? Fill in the following
+  table to help answer this question.\\
+
+  \begin{table}[H]
+	\begin{center}
+		\begin{tabular} {|l|c|c|c|c|} \hline
+			n & Wald & Score & Exact &Wilson\\\hline\hline
+			3	    &&&&\\
+			5     &&&&\\
+			15	  &&&&\\
+			30	  &&&&\\
+			50	  &&&&\\
+			100	  &&&&\\
+			1000  &&&&\\
+			10000 &&&&\\\hline
+		\end{tabular}
+		\caption{Empirical significance levels of hypothesis tests for a population
+		proportion at the 0.05 significance level.}\label{sig1}
+	\end{center}
+\end{table}
+
+	The \textbf{power} of a hypothesis test is defined as the probability that we 
+	reject a null hypothesis when, in fact, we should. Noting this is the complement
+	of the probability of Type II Error, we have
+	\begin{align*}
+	\textrm{Power} &= P(\textrm{reject } H_0 | H_a\textrm{ is true})\\
+				   &= 1-\beta.
+	\end{align*}
+	\textbf{Note:} We want a test that has high power, but we have to worry about
+	balancing it with significance; e.g., a test that simply rejects all null
+	hypotheses has ``perfect" power, but will suffer from high significance.
+
+  We can simulate 10000 binomial experiments with 100 trials with success probability
+  of 0.15 under the null and 0.25 under the alternative using to the following code.
+  Each cell of \texttt{dat} representts one of the 10000 simulated experiments.
+<<eval=FALSE>>=
+sims<-10000
+numTrials<-100
+p0<-0.15 #null hypothesis
+altP<-0.25 #alternative hypothesis
+dat<-rbinom(n=sims,size=numTrials,p=altP) #generate data
+@
+  The nice thing is that you can reuse your code from filling in Table \ref{sig1}
+  to fill in Table \ref{power1} after making the simple change above.\\
+    \begin{table}[H]
+	\begin{center}
+		\begin{tabular} {|l|c|c|c|c|} \hline
+			n &     Wald  & Score & Exact &Wilson\\\hline\hline
+			3	    &&&&\\
+			5     &&&&\\
+			15	  &&&&\\
+			30	  &&&&\\
+			50	  &&&&\\
+			100	  &&&&\\
+			1000  &&&&\\
+			10000 &&&&\\\hline
+		\end{tabular}
+		\caption{Empirical power levels of hypothesis tests for a population
+		proportion at the 0.05 significance level.}\label{power1}
+	\end{center}
+\end{table}
+
+What do you notice about the relationship between power and significance?
+Does one approach stand out in terms of balancing the two? Additionally, 
+for $n=30$, create a scatterplot of the p values for the score test and the 
+exact test. Describe what you see in the plot and discuss the implications
+of the pattern you see. Ensure to attach the plot to your solution.
+\end{enumerate}
+\bibliography{bib}
+\end{document}

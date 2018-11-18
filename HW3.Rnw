@@ -1,0 +1,860 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                     %If you find yourself trying to replicate
+                     %something you found online, ensure you're
+                     %loading the necessary packages!
+\usepackage{amsfonts}%Math font
+\usepackage{graphicx}%For including graphics
+\usepackage{hyperref}%For Hyperlinks
+\usepackage{natbib}        %For the bibliography
+\bibliographystyle{apalike}%For the bibliography
+\usepackage[margin=1.0in]{geometry}
+\usepackage{float}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\SweaveOpts{width=8,height=5}%set the size of the graphs to fit nicely on a 8.5x11 sheet
+\noindent \textbf{MA 354: Data Analysis I -- Fall 2018}\\%\\ gives you a new line
+\noindent \textbf{Homework 3:}\vspace{1em}\\
+\emph{Complete the following opportunities to use what we've talked about in class. 
+These questions will be graded for correctness, communication and succinctness. Ensure
+you show your work and explain your logic in a legible and refined submission.}\\\vspace{1em}
+%Comments -- anything after % is not put into the PDF
+``Hard work is a vector, not a scalar." Record the minutes worked per day on this homework.
+\begin{align*}
+\stackrel{\underline{\hspace{3em}}}{11/01},\stackrel{\underline{\hspace{3em}}}{11/02},
+\stackrel{\underline{\hspace{3em}}}{11/03},\stackrel{\underline{\hspace{3em}}}{11/04},
+\stackrel{\underline{\hspace{3em}}}{11/05},\stackrel{\underline{\hspace{3em}}}{11/06},
+\stackrel{\underline{\hspace{3em}}}{11/07},\stackrel{\underline{\hspace{3em}}}{11/08},\\\\
+\stackrel{\underline{\hspace{3em}}}{11/09},\stackrel{\underline{\hspace{3em}}}{11/10},
+\stackrel{\underline{\hspace{3em}}}{11/11},\stackrel{\underline{\hspace{3em}}}{11/12},
+\stackrel{\underline{\hspace{3em}}}{11/13},\stackrel{\underline{\hspace{3em}}}{11/14},
+\stackrel{\underline{\hspace{3em}}}{11/15},\stackrel{\underline{\hspace{3em}}}{11/16},
+\end{align*}
+\begin{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item[0.] \textbf{Complete weekly diagnostics.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Review} Consider the following simulation.
+  \begin{enumerate}
+    \item Plot the data simulated below. Assess the linear relationship.
+<<>>=
+set.seed(50)
+x_1<-sample(x=seq(0,100,0.01),size=50,replace=TRUE)
+e_1<-rnorm(n=50,mean=0,sd=5)
+y_1<-3.5+2.1*x_1 + e_1
+@
+<<pt1_lin, eval=FALSE>>=
+plot(x_1, y_1)
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<pt1_lin>>
+@
+\caption{Linear Regression Model} \label{Fig:plot1}
+\end{figure}
+
+    \item Write out the population model.
+    \begin{align*}
+      Y_i &= \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \epsilon 
+    \end{align*}
+    \item Fit the model based on the sample data and write out the sample model below.
+<<>>=
+reg1 <- lm(y_1~x_1)
+summary(reg1)
+@
+\begin{align*}
+      Y_i &= \beta_0 + \beta_1 X_1_{i} + \epsilon
+    \end{align*}
+    
+    \item Add the regression line to the plot in black, with lwd=2 and lty=3. Note that 
+    you can do this three ways -- complete this all three ways.
+    \begin{enumerate}
+      \item Use abline. Note this only works when we have one predictor like this.
+      \item Use the sample model you wrote out in part (c).
+      \item Use the predict function.
+<<pt2_lin, eval=FALSE>>=
+plot(x_1, y_1)
+#1.
+abline(reg1, lwd=2, lty=3, col="black")
+#2.
+x1<-seq(0,100,0.01)
+y1 <- 6.36626 + 2.05985*x1
+lines(x1, y1, lwd=2, lty=3, col="black")
+#3.
+pr_y <- predict(reg1, data.frame(x_1))
+lines(x_1,pr_y,lwd=2, lty=3, col="black")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<pt2_lin>>
+@
+\caption{Plot with regression lines} \label{Fig:plot2}
+\end{figure}
+
+    \item Check the assumptions of OLS for this model.
+1. Valid Model: Our data is randomely collected and is valid.\\
+2. Linear Realtionship: Looking at the plot of data we can see there is a clear linear realtionship.\\
+<<reg1_lin, eval=FALSE>>=
+res <- residuals(reg1)
+plot(res)
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<reg1_lin>>
+@
+\caption{Some information about our plot} \label{Fig:plot1}
+\end{figure}
+3. As we can see from the plot above, the errors are independent as there is not pattern to the residual plot and are centered around zero. \\
+4. As our Shapiro-wilks test has a p-value greater than .05 we fail to reject the null hypothesis and provides evidence that our errors are normal. \\
+5. Our Bruesh-Pagan test has a p-value greater than .05 so we fail to reject the null hypothis and provides eviendence that our erros have constant variance. \\
+<<>>=
+library("lmtest")
+res <- residuals(reg1)
+shapiro.test(res)
+bptest(reg1,studentize = FALSE)
+@
+6. Looking at our residual plot, we can see that there are no indicators that any outliers exist. \\
+7. Our R-squared term is very high indicating that we are not missing any predictors. \\
+8. With only one predictor, its impossible to have multicollinearity.
+    \item Interpret the $R^2$ of the model.
+    \end{enumerate}
+Our R-squared is is .992 which states that on average .992 of the variance is accounted for y_1 by x_1. \\
+\end(enumerate)
+    \item Interpret the overall $F$ test of the model. Report all 5 steps.
+Ha: $\beta_1 \neq 0$. Both our complex model and simple model meet the linear model assumptions as proved above. Looking at the summary values, we see that we get an F-statistic of 5920 with 48 DF which gives a p-value less than an alpha level of .05. We have a p-value < 2.2e-16.Thus we reject the null hypothesis as our p-value is below an alpha level of .05 and shows that our one predictor is staistically significant. 
+    \item Interpret the coefficients of the model; are they what you would expect?
+Our coefficent on $x_1$ is is 2.05985 which makes sense as $y_1$ was generated from $x_1$ by multiplying by 2.1 which is why there is such a strong positive correlation.
+  \end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Now, let's add a bad datapoint to the data created in Question 1.
+  \begin{enumerate}
+    \item Plot the data simulated below; ensure to plot the  Assess the linear relationship.
+<<>>=
+x_2<-c(x_1,100)
+y_2<-c(y_1,25)
+@
+<<pt2_lin, eval=FALSE>>=
+plot(x_2, y_2)
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<pt2_lin>>
+@
+\caption{Plot with outlier} \label{Fig:plot3}
+\end{figure}
+    \item Fit the model based on the sample data and write out the sample model below.
+<<>>=
+reg2 <- lm(y_2 ~ x_2)
+summary(reg2)
+@
+    \item Check the assumptions of OLS for this model.
+Our model is still valid as we added used the same model with another data point. There is a clear linear realtionship that can be seem from the plot that our data is roughly linear. The realtionship remains the same with the addition of an outlier at the 100 point of $x_2$. \\
+<<reg2_lin, eval=FALSE>>=
+res <- residuals(reg2)
+plot(res)
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<reg2_lin>>
+@
+\caption{Residuals with outlier} \label{Fig:plot4}
+\end{figure}
+The model's errors still appear to be independent as there is no pattern or bellcurve shape to the residuals and are mostly focused around zero with the exception of the outlier. \\
+We can check to see if our errors are still normal and if they have constant variance using the same tests. 
+<<>>=
+library("lmtest")
+res <- residuals(reg2)
+shapiro.test(res)
+bptest(reg2,studentize = FALSE)
+@
+For both tests we get a p-value less than an alpha level of $.05$ which means we can reject the null hypothesis that errors have constant variance and that our errors are normal which indicates that our errors are non-normal and have non-constant variance. We can tell that our model has a clear outlier with our new data point which is affecting our r-squared term. There is still no multicollinearity affecting our model as there is still only one predictor. 
+    \item Plot the data and regression lines from Questions 1-2. Add the regression line to the 
+    plot in red.
+<<pt2_plot, eval=FALSE>>=
+plot(x_2, y_2)
+#1.
+abline(reg1, lwd=2, lty=3, col="black")
+#2.
+x1<-seq(0,100,0.01)
+y1 <- 6.36626 + 2.05985*x1
+lines(x1, y1, lwd=2, lty=3, col="black")
+#3.
+pr_y <- predict(reg1, data.frame(x_1))
+lines(x_1,pr_y,lwd=2, lty=3, col="black")
+
+abline(reg2, lwd=2, lty=3, col="red")
+pr_y2 <- predict(reg2, data.frame(x_2))
+lines(x_2,pr_y2,lwd=2, lty=3, col="red")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<pt2_plot>>
+@
+\caption{Plot with regression lines} \label{Fig:plot5}
+\end{figure}
+    \item Interpret the coefficients of the model; are they what you would expect?
+<<>>=
+summary(reg2)
+@
+Our coefficents are what we expect as our our coefficent is 1.779 which is slightly lower than our previous model which had larger coefficent. This is brought down by our outlier that is lower than the expected data and thus makes sense that its a smaller positive coefficent. 
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Continue with the data from Question 2.
+\begin{enumerate}
+    \item Plot the residuals of your model against $x_2$ as well as the residuals 
+    against predicted.
+<<res_plot, eval=FALSE>>=
+res <- residuals(reg2)
+pr_y2 <- predict(reg2, data.frame(x_2))
+res1 <- y_2-pr_y2
+plot(x_2, res, col="red")
+points(pr_y2, res, col="blue")
+points(x_2, res1, col="green")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<res_plot>>
+@
+\caption{Residual Plot with Predicted in Blue} \label{Fig:plot2}
+\end{figure}    
+If we matched the residuals from our predicted graph with the residuals we get an exact copy over of the points using reg2. If we compare the residuals against predicted value we get the seperate set of blue points. 
+    \item Fit the appropriate model for estimating the weights for weighted least 
+    squares regression (See Lecture 17.)
+<<>>=
+mod_res1<-lm(abs(residuals(reg2))~x_2)
+weights1<-1/(fitted(mod_res1))^2 #Added a small value to avoid error
+@
+    \item Provide a summary of the weights. How does the weight for the observation 
+    (100,25) compare to the other observations?
+<<>>=
+summary(weights1)
+@
+As (100,25) is our largest overservation we see that it weighs far more than any other at 910 comparing to our median which is .0131. 
+    \item Use the weights from the previous part to fit a weighted least squares 
+    regression.
+<<>>=
+reg_robust1<-lm(y_2~x_2,weights=weights1)
+summary(reg_robust1)
+@
+    \item Check the assumptions of OLS for this model.
+The validity of our model still holds. The data points are still the same as they are roughly linear with the outlier added. Looking at our residual plot below we can see that the residuals are much closer to the zero accoubting for the outlier and have no pattern which indicates independence. 
+<<res_rob, eval=FALSE>>=
+res <- residuals(reg_robust1)
+plot(res)
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<res_rob>>
+@
+\caption{Residual Plot with Predicted in Blue} \label{Fig:Plot7}
+\end{figure}    
+<<>>=
+library("lmtest")
+res <- residuals(reg_robust1)
+shapiro.test(res)
+bptest(reg2,studentize = FALSE)
+@
+Althought our p-values are still large indicating that our errors are non-normal with non-constant variance, they are larger than our previous model indicating that our model does better at accounting for the error than previous models with the outlier added. 
+    \item Plot the data and regression lines from Questions 1-2. Add the regression 
+    line to the plot in blue.
+<<weight_plot, eval=FALSE>>=
+plot(x_2, y_2)
+#1.
+abline(reg1, lwd=2, lty=3, col="black")
+#2.
+x1<-seq(0,100,0.01)
+y1 <- 6.36626 + 2.05985*x1
+lines(x1, y1, lwd=2, lty=3, col="black")
+#3.
+pr_y <- predict(reg1, data.frame(x_1))
+lines(x_1,pr_y,lwd=2, lty=3, col="black")
+
+abline(reg2, lwd=2, lty=3, col="red")
+pr_y2 <- predict(reg2, data.frame(x_2))
+lines(x_2,pr_y2,lwd=2, lty=3, col="red")
+pr_we <- predict(reg_robust1, data.frame(x_2))
+lines(x_2, pr_we, lwd=2, lty=3, col="blue")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<weight_plot>>
+@
+\caption{Plot with regression lines} \label{Fig:plo8}
+\end{figure}
+    \item Interpret the coefficients of the model; are they what you would expect?
+<<>>=
+summary(reg_robust1)
+@
+Our coefficent on $x_2$ is a larger positive which makes more sense as the regression model is putting more emphasis on terms with smaller squared residuals. The intercept is negative which I did not expect but makes sense as we are trying to follow the linear pattern of the data and putting less weight on the outlier. 
+  \end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Continue with the data from Question 3.
+\begin{enumerate}
+    \item Fit a robust regression using Huber-weighted iterated reweighted least 
+    squares and write out the sample model below.
+<<>>=
+library("MASS")
+reg2_hub<-rlm(y_2~x_2,psi=psi.huber)
+@
+    \item Plot the data and regression lines from Questions 1-3. Add the regression
+    line to the plot in purple.
+<<hub_plot, eval=FALSE>>=
+plot(x_2, y_2)
+#1.
+abline(reg1, lwd=2, lty=3, col="black")
+#2.
+x1<-seq(0,100,0.01)
+y1 <- 6.36626 + 2.05985*x1
+lines(x1, y1, lwd=2, lty=3, col="black")
+#3.
+pr_y <- predict(reg1, data.frame(x_1))
+lines(x_1,pr_y,lwd=2, lty=3, col="black")
+
+abline(reg2, lwd=2, lty=3, col="red")
+pr_y2 <- predict(reg2, data.frame(x_2))
+lines(x_2,pr_y2,lwd=2, lty=3, col="red")
+pr_we <- predict(reg_robust1, data.frame(x_2))
+lines(x_2, pr_we, lwd=2, lty=3, col="blue")
+pr_hub <- predict(reg2_hub, data.frame(x_2))
+lines(x_2, pr_hub, lwd=2, lty=3, col="purple")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<hub_plot>>
+@
+\caption{Plot with regression lines} \label{Fig:plo8}
+\end{figure}
+    \item Interpret the coefficients of the model; are they what you would expect?
+<<>>=
+summary(reg2_hub)
+@
+Yes our coefficents are what we expect. As its an iterative process across all of the weights the forumula will be allow the regression plot to more accurately match the linear pattern of the data by having a smaller $x_2$ coefficent as our intercept is larger and more accuretly weights our model with the outlier introduced. 
+  \end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Continue with the data from Question 4.
+\begin{enumerate}
+    \item Fit a robust regression using Bisquare-weighted iterated reweighted 
+    least squares and write out the sample model below.
+<<>>=
+library(MASS)
+reg2_bi<-rlm(y_2~x_2,psi=psi.bisquare)
+@
+    \item Plot the data and regression lines from Questions 1-4. Add the regression 
+    line to the plot in purple.
+<<bi_plot, eval=FALSE>>=
+plot(x_2, y_2)
+#1.
+abline(reg1, lwd=2, lty=3, col="black")
+#2.
+x1<-seq(0,100,0.01)
+y1 <- 6.36626 + 2.05985*x1
+lines(x1, y1, lwd=2, lty=3, col="black")
+#3.
+pr_y <- predict(reg1, data.frame(x_1))
+lines(x_1,pr_y,lwd=2, lty=3, col="black")
+
+abline(reg2, lwd=2, lty=3, col="red")
+pr_y2 <- predict(reg2, data.frame(x_2))
+lines(x_2,pr_y2,lwd=2, lty=3, col="red")
+pr_we <- predict(reg_robust1, data.frame(x_2))
+lines(x_2, pr_we, lwd=2, lty=3, col="blue")
+pr_hub <- predict(reg2_hub, data.frame(x_2))
+lines(x_2, pr_hub, lwd=2, lty=3, col="purple")
+pr_bi <- predict(reg2_bi, data.frame(x_2))
+lines(x_2, pr_bi, lwd=2, lty=3, col="purple")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<bi_plot>>
+@
+\caption{Plot with regression lines} \label{Fig:plo8}
+\end{figure}
+    \item Interpret the coefficients of the model; are they what you would expect?
+<<>>=
+summary(reg2_bi)
+@
+  \end{enumerate}
+  
+I am a little suprised by the coefficents of the model I would have thought the intercept would have been higher and $x_2$ would have been larger but the coefficent on $x_2$ was slightly smaller than on the huber model. The coefficent is still logical howerver as its a slight positive that puts less emphasis on the outlier with the addition of the new weights. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 6
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Continue with the data from Question 5.
+\begin{enumerate}
+    \item Fit a quantile regression and write out the sample model below.
+<<>>=
+library("quantreg")
+reg2_quant<-rq(y_2~x_2)
+@
+    \item Plot the data and regression lines from Questions 1-5. Add the regression 
+    line to the plot in black
+<<quant_plot, eval=FALSE>>=
+plot(x_2, y_2)
+#1.
+abline(reg1, lwd=2, lty=3, col="black")
+#2.
+x1<-seq(0,100,0.01)
+y1 <- 6.36626 + 2.05985*x1
+lines(x1, y1, lwd=2, lty=3, col="black")
+#3.
+pr_y <- predict(reg1, data.frame(x_1))
+lines(x_1,pr_y,lwd=2, lty=3, col="black")
+
+abline(reg2, lwd=2, lty=3, col="red")
+pr_y2 <- predict(reg2, data.frame(x_2))
+lines(x_2,pr_y2,lwd=2, lty=3, col="red")
+pr_we <- predict(reg_robust1, data.frame(x_2))
+lines(x_2, pr_we, lwd=2, lty=3, col="blue")
+pr_hub <- predict(reg2_hub, data.frame(x_2))
+lines(x_2, pr_hub, lwd=2, lty=3, col="purple")
+pr_bi <- predict(reg2_bi, data.frame(x_2))
+lines(x_2, pr_bi, lwd=2, lty=3, col="purple")
+pr_quant <- predict(reg2_quant, data.frame(x_2))
+lines(x_2, pr_quant, lwd=2, lty=3, col="black")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<quant_plot>>
+@
+\caption{Plot with regression lines} \label{Fig:plot11}
+\end{figure}
+    \item Interpret the coefficients of the model; are they what you would expect?
+<<>>=
+summary(reg2_quant, se="ker")
+@
+Yes these coefficents are similar to what I expect as its very similar to our coefficents for our regression equation without our outlier and accurately represents the linear realtionship of the data while putting less emphasis on the outlier. The only large difference is that our intercept is larger than our original model. \\
+  \end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 7
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Reflect on Questions 1-6.
+  \begin{enumerate}
+    \item Which model is ``right"? If there's no one model 
+      that is ``right", which one is ``best"? You might consider the AIC, BIC, Log 
+      Likelihood, cross validation etc.\\
+I do not believe that any model is "right" rather that each model is better at correcting for the outlier and addressing the clear linearity of the plot that is skewed by the data. As our original linear model contianed a high r-squared value while no outlier I deem that to be a good plot. When the outlier is added, the best regression model is the bi-squared regression model to most accurately represent the data point while maintaining a similar coefficent for our x term. Although our intercept is higher smaller than our original regression model, it maintains a close realtionship while adressing the non-normal and non-constant errors that are generated from the added outlier. The bi-squared term is the best model for addressing this issue with our given data set. \\
+    \item Rerun your code for Questions 1-6, but change the original sample size
+    from 50 to 1000. There's no need to redo all of the parts from those questions,
+    but discuss the difference. Look at the graph of the data with all the fitted
+    regression models and compare it to that from the original data.
+<<quant_plot, eval=FALSE>>=
+library("MASS")
+library("quantreg")
+
+set.seed(1000)
+x_1<-sample(x=seq(0,100,0.01),size=50,replace=TRUE)
+e_1<-rnorm(n=50,mean=0,sd=5)
+y_1<-3.5+2.1*x_1 + e_1
+x_2<-c(x_1,100)
+y_2<-c(y_1,25)
+plot(x_2, y_2)
+
+reg1 <- lm(y_1~x_1)
+reg2 <- lm(y_2 ~ x_2)
+mod_res1<-lm(abs(residuals(reg2))~x_2)
+weights1<-1/(fitted(mod_res1))^2 
+reg_robust1<-lm(y_2~x_2,weights=weights1)
+reg2_hub<-rlm(y_2~x_2,psi=psi.huber)
+reg2_bi<-rlm(y_2~x_2,psi=psi.bisquare)
+reg2_quant<-rq(y_2~x_2)
+
+#1.
+abline(reg1, lwd=2, lty=3, col="black")
+#2.
+x1<-seq(0,100,0.01)
+y1 <- 6.36626 + 2.05985*x1
+lines(x1, y1, lwd=2, lty=3, col="black")
+#3.
+pr_y <- predict(reg1, data.frame(x_1))
+lines(x_1,pr_y,lwd=2, lty=3, col="black")
+
+abline(reg2, lwd=2, lty=3, col="red")
+pr_y2 <- predict(reg2, data.frame(x_2))
+lines(x_2,pr_y2,lwd=2, lty=3, col="red")
+pr_we <- predict(reg_robust1, data.frame(x_2))
+lines(x_2, pr_we, lwd=2, lty=3, col="blue")
+pr_hub <- predict(reg2_hub, data.frame(x_2))
+lines(x_2, pr_hub, lwd=2, lty=3, col="purple")
+pr_bi <- predict(reg2_bi, data.frame(x_2))
+lines(x_2, pr_bi, lwd=2, lty=3, col="purple")
+pr_quant <- predict(reg2_quant, data.frame(x_2))
+lines(x_2, pr_quant, lwd=2, lty=3, col="black")
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<quant_plot>>
+@
+\caption{Plot with regression lines} \label{Fig:plot15}
+\end{figure}
+
+This further our claim that bi-squared regression appears to address the outlier discreptancy the best by maintaining a similar plot when increase the samle size from 50 to 1000. The other regression lines such as weighted robust, huber, and quant are clearly different at either the low end or in the case of weighted regression higher end of data and thus don't represent the data set as well. Using the bisquared we mantain the postitive linear realtionship of our data. \\
+
+  \end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item Read 
+\href{http://med.stanford.edu/news/all-news/2018/10/older-fathers-associated-with-increased-birth-risks.html}{this
+article}. Think about what you've read and relate it to topics from class or 
+pose a question about the article that might provide for a productive conversation 
+in class. For example, I found the paragraph about lottery tickets to be very 
+interesting and a nice way of characterizing our discussions in class.\\
+
+I think this article provides an interesting question of adjusting to changes in sample. When we adress coefficents we say that an increase in x cause a B increase on Y on average. However, addressing the correlation between x and Y terms isn't always something thought of. So for example, with older men having more genetic mutations we could hypothsis that they would be associated with Women that have older ages and thus would also have higher mutations. To correctly adress these problems we would need an outside variable that affects x but not Y to identify changes of x while ignoring the effect x has indirectly on y. This proposes a lot of different (and immoral) expierments such as tests that use older men and younger women to test identify genetic mutations that are correltated with male age in order to account for the genetic mutations that may be correlated with a mutual age increase. \\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 9
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Case Study} Hepatitis C is a disease that affects the liver. The virus that causes hepatitis C 
+    is spread through blood or bodily fluids of an infected person. 
+    The virus is often difficult to diagnose because there are few unique 
+    symptoms. Those infected, however, sometimes experience jaundice -- a 
+    condition that causes yellowing of the skin or eyes, as the liver 
+    is infected.
+
+    \cite{Bracht16} consider the human microfibrillar-associated protein 4,
+    or MFAP4, and its role in disease-related tissue. Stage 0--no fibrosis; 
+    Stage 1--enlarged, fibrotic portal tracts; Stage 2--periportal fibrosis 
+    or portal-portal septa, but intact architecture; Stage 3--fibrosis with
+    architectural distortion, but no obvious cirrhosis; and Stage 4--probable
+    or definite cirrhosis.
+
+    Previously, it has been shown that MFAP4 is a biomarker candidate for hepatic
+    fibrosis and cirrhosis in hepatitis C patients. The analysis of \cite{Bracht16}
+    aimed to consider the ability of MFAP4 to differentiate between stages of the 
+    disease -- fibrosis stages (0-2) and cirrhosis (3-4) based on the Scheuer 
+    scoring system.
+
+<<eval=TRUE>>=
+###Download data
+dat<-read.table("http://cipolli.com/students/biomarkerData.txt",header=T,sep=",")
+head(dat)
+@
+  Use your tools to build a regression model that predicts MFAP4 levels based on age, 
+  fibrosis stages, and cirrhosis stage. Consider a model that uses a transformation
+  and a model that uses a robust regression technique. Ensure to compare and contrast
+  results. \\
+
+Running a linear regression test first using all variables will help contextualize the data and give evidence on what transformations are needed to simplify the model. 
+<<>>=
+dat$age <-0
+dat$age <- (2016-dat$Year.of.Birth)
+dat$cirrosis <-0
+dat$cirrosis[dat$Fibrosis.Stage<3] <-0
+dat$cirrosis[dat$Fibrosis.Stage==3] <-1
+dat$cirrosis[dat$Fibrosis.Stage==4] <-2
+dat$fibrosis <-0
+dat$fibrosis[dat$Fibrosis.Stage>3] <- 0
+dat$fibrosis[dat$Fibrosis.Stage ==2] <-2
+dat$fibrosis[dat$Fibrosis.Stage ==1] <-1
+dat$fibrosis[dat$Fibrosis.Stage ==0] <-0
+lin_full <- lm(dat$MFAP4~dat$age+dat$cirrosis+dat$fibrosis)
+summary(lin_full)
+@
+
+We need to build a data set on data points of intrest while maintaing the Fibrosis Cirrosis difference. By plotting the model, the distribution of data portrays that our errors do not uphold the OLS assumptions. 
+<<residuals, eval=FALSE>>=
+plot(lin_full, which = 1:2)
+@
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<residuals>>
+@
+\caption{Full Regression Residual Plot} \label{Fig:plot12}
+\end{figure}
+
+Looking at our qq blot we see that the data does not appear to have normal errors as our graph doesn't match the linear regression line with the right end tailing off. To double check, the shapior and bptests have low p-values which indicate that the model has non-constant variance and non-normal errors. 
+<<>>=
+library("lmtest")
+res <- residuals(lin_full)
+shapiro.test(res)
+bptest(lin_full,studentize = FALSE)
+@
+
+Using a Box-Cox test to give a result saying which transformation will give the best model. This we can compare to a huber model to address the variance at the right end of the model with addressing the outlier with the residual of 198. 
+
+<<>>=
+library("MASS")
+boxcoxval <- boxcox(lin_full)
+max <- boxcoxval$x[which(boxcoxval$y==max(boxcoxval$y))]
+box_mod <- lm(MFAP4^(max)~age+fibrosis+cirrosis, data=dat)
+summary(box_mod)
+@
+We can also create a robust quantile regression test to see if the results are better as looking at our qq plot our regression explains less of the variance in the third and fourth quantile.
+<<>>=
+library("quantreg")
+library("lmtest")
+reg_quant<-rq(MFAP4~age+fibrosis+cirrosis,data=dat)
+summary(reg_quant, se="ker")
+res <- residuals(reg_quant)
+shapiro.test(res)
+bptest(reg_quant,studentize = FALSE)
+bptest(lin_full)
+@
+
+Our quantile regression appears to give the best results as our errors are non-normal and contain non-constant vraince the model scores better on the shapiro and brueshc pagan test and gives a more accurate linear distribution of the residual plots. Quantile regressions tend to be more powerful and address more of the errors coming from outliers in the model. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Case Study} The MASS package in \texttt{R} \citep{MASS} provides data about housing values
+  in the Suburbs of Boston. The data provided is described below.
+  \begin{itemize}
+    \item \textbf{crim} -- per capita crime rate by town.
+    \item \textbf{zn} -- proportion of residential land zoned for lots over 25,000 sq.ft.
+    \item \textbf{indus} -- proportion of non-retail business acres per town.
+    \item \textbf{chas} -- Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
+    \item \textbf{nox} -- nitrogen oxides concentration (parts per 10 million).
+    \item \textbf{rm} -- average number of rooms per dwelling.
+    \item \textbf{age} -- proportion of owner-occupied units built prior to 1940.
+    \item \textbf{dis} -- weighted mean of distances to five Boston employment centres.
+    \item \textbf{rad} -- index of accessibility to radial highways.
+    \item \textbf{tax} -- full-value property-tax rate per \$10,000.
+    \item \textbf{ptratio} -- pupil-teacher ratio by town.
+    \item \textbf{black} -- $1000(Bk - 0.63)^2$ where $Bk$ is the proportion of blacks by town.
+    \item \textbf{lstat} -- lower status of the population (percent).
+    \item \textbf{medv} -- median value of owner-occupied homes in \$1000s.
+  \end{itemize}
+  You can load this data using
+<<>>=
+#install.packages("MASS",repos = "http://cloud.r-project.org/")
+library(MASS)
+data(Boston)
+@
+  Use your tools to build a regression model that predicts the median value of owner-occupied homes
+  in \$1000s based on the other variables in the data set.
+  
+<<>>=
+library(MASS)
+reg_full <- lm(medv~. , data = Boston)
+reg_step <- stepAIC(reg_full, k=log(nrow(Boston)), direction = "both", trace = FALSE)
+summary(reg_step)
+@
+First a BIC test will give an idea of which variables to keep behind and which are significant. This gives us a model the results which we can then use to build a graph of the predicted model and check its linearity. 
+<<residuals_BIC, eval=FALSE>>=
+res <- residuals(reg_step)
+plot(Boston$medv, res)
+@
+
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<residuals_BIC>>
+@
+\caption{BIC Linearity Plot} \label{Fig:plot12}
+\end{figure}
+
+Here we can see that our data is still not linear and faces a skew towares the right end of the distribution which makes our data appear non-linear. If we run shapiro and bruesch pagan tests we can confirm this results and indicates that our errors are non-normal and have non-constant variance.
+<<>>=
+library("lmtest")
+res <- residuals(reg_step)
+shapiro.test(res)
+bptest(reg_step, studentize = FALSE)
+@
+  
+To adjust for this a more robust model is needed using the same variables given by the BIC model applying a quantile regression plot should help solve and make our errors more normal and fix our non constant errors. 
+
+<<>>=
+library("quantreg") 
+library("MASS")
+quant_mod <- rq(stepAIC(reg_full, k=log(nrow(Boston)), direction = "both", trace = FALSE))
+summary(quant_mod)
+@
+
+<<>>=
+library("lmtest")
+res <- residuals(quant_mod)
+shapiro.test(res)
+bptest(quant_mod, studentize = FALSE)
+@
+
+Our data is still returned as non-normal and contains non-constant error. Graphing the results below the residual plot only slightly improves indicating that our models outliers are still causing the descrepancies in the data. 
+<<residuals_BIC, eval=FALSE>>=
+res <- residuals(quant_mod)
+plot(Boston$medv, res)
+@
+
+As quantile regression did not improve our results running a different robust regression using the huber model to revweight the variables in order to address outliers.
+
+<<>>=
+library("lmtest")
+reg_robust<-rlm(Boston$medv~. , data = Boston, psi=psi.huber)
+summary(reg_robust)
+res <- residuals(reg_robust)
+shapiro.test(res)
+bptest(quant_mod, studentize = FALSE)
+@
+
+Again our results are still showing that our error is non-normal and contains non-constant error. However, our quantile regression reults had the best results of the tests and plot was better than our normal BIC test and as such $quant_reg$ was the best fit model to predict median value of homes. 
+
+\begin{figure}[H]
+\centering
+<<fig=TRUE,echo=FALSE>>=
+library("graphics")
+<<residuals_BIC>>
+@
+\caption{Residuals BIC} \label{Fig:plot12}
+\end{figure}
+As we can see our intercept is drastically different and our model has changed to incorporate more 
+  \newpage
+  \item Chapter 4, Question 2.\\
+<<>>=
+fn<-"https://raw.githubusercontent.com/avehtari/RAOS-Examples/master/Earnings/data/earnings.csv"
+dat<-read.csv(file=fn,header=T,sep=",")
+@
+A)Looking at our data set, we can see that almost all the used variables are logical. Age seems appropriate, education can be low with 3 representing 3 years completed of elementary school but cannot be taken out of the data set. Race is catagorical for each race, sex is binary 1 or 2, and height all seems appropriate even with the lowest bound being 4'8". However earn had plenty of 0's which indicates a lack of data collected and needed to be cleaned out. Thus we have we need to clean the dataset. 
+<<>>=
+earnings <- dat$earn[dat$earn>0]
+summary(earnings)
+height <- dat$height[dat$earn>0]
+summary(height)
+#mean(earnings)
+@
+B) I believe we subtract the mean from the height and earnings if we want the intercept to equal the mean of hieght and earnings. By subtracting the mean from each data point we effectively center the data. Here we can see the results in the summary statistics of a shifted regression and a non-shifted regression.
+
+<<>>=
+reg_unshifted <- lm(earnings~height)
+summary(reg_unshifted)
+height_shifted <- height-mean(height)
+earnings_shited <- earnings-mean(earnings)
+reg_shifted <- lm(earnings_shited~ height_shifted)
+summary(reg_shifted)
+@
+
+C)
+Below contains the reults of a boxcox transformation and a boxcox transformation including the interaction variables between race and education and between sex and education.
+<<>>=
+#boxcox
+library("MASS")
+age <- dat$age[dat$earn>0]
+ed <- dat$ed[dat$earn>0]
+race <- dat$race[dat$earn>0]
+sex <- dat$sex[dat$earn>0]
+full_model <- lm(earnings~ height+age+ed+race+sex)
+reg_interact <- lm(earnings~ height+age+ed+race+sex+race*ed+ed*sex)
+summary(full_model)
+summary(reg_interact)
+boxcoxval <- boxcox(full_model)
+max <- boxcoxval$x[which(boxcoxval$y==max(boxcoxval$y))]
+box_mod <- lm(earnings^(-max)~height+age+ed+race+sex)
+boxcoxval <- boxcox(reg_interact)
+max <- boxcoxval$x[which(boxcoxval$y==max(boxcoxval$y))]
+box_mod_i <-lm(earnings^(-max)~height+age+ed+race+sex+race*ed+ed*sex)
+summary(box_mod)
+summary(box_mod_i)
+@
+
+Below contains the z-score transformation with a full model and one that contains the same interaction terms as above. 
+<<>>=
+#zscore
+z_earnings <-(earnings-mean(earnings))/sd(earnings)
+z_age <-(age-mean(age))/sd(age)
+z_height <-(height-mean(height))/sd(height)
+z_ed <-(ed-mean(ed))/sd(ed)
+z_race <-(race-mean(race))/sd(race)
+z_sex <-(sex-mean(sex))/sd(sex)
+Z_model <- lm(z_earnings~z_age+z_height+z_ed+z_race+z_sex)
+z_model_i <- lm(z_earnings~z_age+z_height+z_ed+z_race+z_sex+z_ed*z_race+z_ed*z_sex)
+summary(Z_model)
+summary(z_model_i)
+@
+
+I believe that the boxcox transformation including the interaction terms is the best model for predicting this data. THe interaction terms are statstically signficant with the full model and using the box cox transformation they help explain some of the outliers and distribution of the data. I chose these variables as I both race and sex are affecting education and education plays a large effect on race. I would expect such distribution to be skewed towards white individuals to have access ot higher education and get an incrase benifit to earnings where women may earn less with the higher education due to wage gap discreptancies. \\
+
+  \textbf{Remark:} Many (roughly 50\%) of students had a solution very similar to a set of solutions
+  posted to GitHub. I view homework as a place where the substantive and most valuable learning 
+  about the material introduced in class happens. Few, if any students, used the material without 
+  thinking about it. Many students that used the online solution added to the solution to make it
+  better and many more showed evidence of trying to understand the solution. I understand the 
+  temptation to view the solutions as a way of  checking your own solution or as a way to get started.
+  I expect you all to have \emph{better} solutions than those posted. I was happy to see that the
+  part of the posted solution which is blatently incorrect wasn't seen in anyone's solutions;
+  this means you're discriminating between right and wrong solutions which is exactly what we're 
+  practicing.\\
+  
+  If you feel stuck, ask a question in office hours, on Moodle, or in the diagnostics. The 
+  conversations we have are vastly more productive than me telling you anything. Afterall,
+  our goal is pragmatic problem solving -- we're painting a sunset, not following a fixed 
+  structure. \href{https://news.yale.edu/2018/07/19/arent-sure-brain-primed-learning}{This article}
+  discusses how predictability hinders learning in monkeys -- this is extrapolated to humans
+  when the author suggests ``we only learn when there is uncertainty, and that is a good thing."\\
+  
+  You may stumble when starting a data analysis or approaching an interpretation, but that's okay.
+  In fact, that struggle and the following overcoming of it is an effective learning tool, 
+  especially if you can appreciate that mistakes are an inevitable and, in fact, essential 
+  part of data analysis (and the learning process). In the end, even though we might feel powerless
+  to start, we have the tools to make mistakes and ameliorate them -- think about your toolbox!
+  You have more power and control than you think. If you feel stuck on where to start, try doing
+  something (anything). Take the plunge. You might make missteps. You can always step back,
+  ask ``does this make sense?", continue if it does and adjust or collaborate if it doesn't. 
+  My guess is you'll be surprised, and even pleased at how much you've learned and how far
+  you've expanded your mathematics/computer science/statistical repertoires.\\
+  
+  \textbf{TLDR:} I know the solutions are posted online, many of them are incorrect or not as
+  good as you can do yourself.
+\end{enumerate}
+\bibliography{bib}
+\end{document}
